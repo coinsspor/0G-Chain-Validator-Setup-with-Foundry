@@ -26,7 +26,7 @@
 | **Network** | 100 Mbps | 100 Mbps |
 
 ### Software Requirements
-- ✅ **Ubuntu 18.04+** or Debian-based Linux
+- ✅ **Ubuntu 22.04+** or Debian-based Linux
 - ✅ **0G Node** synced and running
 - ✅ **32+ OG Tokens** for staking
 - ✅ **Root/sudo access**
