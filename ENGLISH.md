@@ -56,7 +56,7 @@ sudo apt update && sudo apt install -y curl jq
 
 # Check if 0G node is synced
 curl -s http://localhost:26657/status | jq .result.sync_info.catching_up
-# Should return: false (synced)
+# USE YOUR OWN RPC PORT ,DEFAULT 26657 ,Should return: false (synced)
 ```
 
 ### 2. Install Foundry
