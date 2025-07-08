@@ -107,12 +107,12 @@ export CHAIN_SPEC=devnet
 # 0G Testnet configuration
 export RPC_URL=https://evmrpc-testnet.0g.ai
 export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9
-export INITIAL_STAKE=32000000000  # 32 OG in gwei
+export INITIAL_STAKE=32000000000000000000  # 32 OG in gwei
 
 # Make persistent (add to ~/.bashrc)
 echo "export RPC_URL=https://evmrpc-testnet.0g.ai" >> ~/.bashrc
 echo "export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9" >> ~/.bashrc
-echo "export INITIAL_STAKE=32000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE=32000000000000000000" >> ~/.bashrc
 ```
 
 ### 2. Verify Required Files
@@ -201,8 +201,10 @@ cast send $STAKING_CONTRACT \
   50000 \
   1 \
   $PUBKEY \
-  $SIGNATURE \
+ $SIGNATURE \
   --value $INITIAL_STAKE \
+  --gas-limit 1000000 \
+  --gas-price 50000000000 \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
@@ -243,7 +245,7 @@ cast call $STAKING_CONTRACT \
     $PUBKEY \
     --rpc-url $RPC_URL
 
-# Check validator balance (should show 32000000000)
+# Check validator balance (should show 32000000000000000000)
 cast call $VALIDATOR_CONTRACT \
     "tokens()(uint256)" \
     --rpc-url $RPC_URL
@@ -278,6 +280,8 @@ curl -s http://localhost:26657/validators | jq '.result.validators[] | select(.p
 cast send $VALIDATOR_CONTRACT \
     "withdrawCommission(address)" \
     $YOUR_WALLET_ADDRESS \
+    --gas-limit 1000000 \
+    --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -306,6 +310,8 @@ cast send $VALIDATOR_CONTRACT \
     "delegate(address)" \
     $YOUR_WALLET_ADDRESS \
     --value 1000000000 \
+    --gas-limit 1000000 \
+    --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -358,7 +364,7 @@ echo "Get tokens from: https://faucet.0g.ai"
 ```bash
 # Check stake amount
 echo $INITIAL_STAKE
-# Must be exactly 32000000000 (32 OG in gwei)
+# Must be exactly 32000000000000000000 (32 OG in gwei)
 ```
 
 #### 3. "signature mismatch"
@@ -437,7 +443,7 @@ Your validator setup is successful if:
 
 - ✅ **Transaction confirmed** - Shows SUCCESS status on explorer
 - ✅ **getValidator()** returns your validator contract address
-- ✅ **tokens()** returns 32000000000 (32 OG)
+- ✅ **tokens()** returns 32000000000000000000 (32 OG)
 - ✅ **Node logs** show validator activation messages
 - ✅ **Consensus participation** - Validator appears in validator set
 
