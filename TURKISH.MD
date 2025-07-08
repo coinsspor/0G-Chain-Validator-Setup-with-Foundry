@@ -113,6 +113,7 @@ export INITIAL_STAKE=32000000000  # 32 OG gwei cinsinden
 echo "export RPC_URL=https://evmrpc-testnet.0g.ai" >> ~/.bashrc
 echo "export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9" >> ~/.bashrc
 echo "export INITIAL_STAKE=32000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE2=32000000000000000000" >> ~/.bashrc
 ```
 
 ### 2. Gerekli Dosyaları Doğrula
@@ -202,7 +203,9 @@ cast send $STAKING_CONTRACT \
   1 \
   $PUBKEY \
   $SIGNATURE \
-  --value $INITIAL_STAKE \
+  --gas-limit 1000000 \
+  --gas-price 50000000000 \
+  --value $INITIAL_STAKE2 \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
@@ -243,7 +246,7 @@ cast call $STAKING_CONTRACT \
     $PUBKEY \
     --rpc-url $RPC_URL
 
-# Validator bakiyesini kontrol et (32000000000 göstermeli)
+# Validator bakiyesini kontrol et (32000000000000000000 göstermeli)
 cast call $VALIDATOR_CONTRACT \
     "tokens()(uint256)" \
     --rpc-url $RPC_URL
