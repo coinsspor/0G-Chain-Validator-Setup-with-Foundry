@@ -107,12 +107,16 @@ export CHAIN_SPEC=devnet
 # 0G Testnet configuration
 export RPC_URL=https://evmrpc-testnet.0g.ai
 export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9
-export INITIAL_STAKE=32000000000000000000  # 32 OG in gwei
+
+# Stake amounts (different for EVM and Cosmos operations)
+export INITIAL_STAKE_EVM=32000000000000000000    # 32 OG in wei (for EVM/cast commands)
+export INITIAL_STAKE_COSMOS=32000000000          # 32 OG in Cosmos format (for 0gchaind commands)
 
 # Make persistent (add to ~/.bashrc)
 echo "export RPC_URL=https://evmrpc-testnet.0g.ai" >> ~/.bashrc
 echo "export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9" >> ~/.bashrc
-echo "export INITIAL_STAKE=32000000000000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE_EVM=32000000000000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE_COSMOS=32000000000" >> ~/.bashrc
 ```
 
 ### 2. Verify Required Files
@@ -159,11 +163,11 @@ export VALIDATOR_CONTRACT=$VALIDATOR_CONTRACT
 
 ### 5. Generate Signature
 ```bash
-# Create validator signature
+# Create validator signature (using Cosmos format)
 echo "=== Generating Validator Signature ==="
 0gchaind deposit create-validator \
   $VALIDATOR_CONTRACT \
-  $INITIAL_STAKE \
+  $INITIAL_STAKE_COSMOS \
   $GENESIS_PATH \
   --home $HOME_DIR \
   --chaincfg.chain-spec=$CHAIN_SPEC
@@ -193,7 +197,7 @@ cast balance $YOUR_WALLET_ADDRESS --rpc-url $RPC_URL --ether
 
 ### 7. Register Validator
 ```bash
-# Register validator with staking contract
+# Register validator with staking contract (using EVM format)
 echo "=== Registering Validator ==="
 cast send $STAKING_CONTRACT \
   "createAndInitializeValidatorIfNecessary((string,string,string,string,string),uint32,uint96,bytes,bytes)" \
@@ -201,8 +205,8 @@ cast send $STAKING_CONTRACT \
   50000 \
   1 \
   $PUBKEY \
- $SIGNATURE \
-  --value $INITIAL_STAKE \
+  $SIGNATURE \
+  --value $INITIAL_STAKE_EVM \
   --gas-limit 1000000 \
   --gas-price 50000000000 \
   --private-key $PRIVATE_KEY \
@@ -309,7 +313,7 @@ cast call $VALIDATOR_CONTRACT \
 cast send $VALIDATOR_CONTRACT \
     "delegate(address)" \
     $YOUR_WALLET_ADDRESS \
-    --value 1000000000 \
+    --value 1000000000000000000 \
     --gas-limit 1000000 \
     --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
@@ -323,7 +327,7 @@ cast send $VALIDATOR_CONTRACT \
     "undelegate(address,uint256)" \
     $WITHDRAWAL_ADDRESS \
     $SHARES_AMOUNT \
-    --value 1000000000 \
+    --value 1000000000000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -362,17 +366,21 @@ echo "Get tokens from: https://faucet.0g.ai"
 
 #### 2. "DelegationBelowMinimum"
 ```bash
-# Check stake amount
-echo $INITIAL_STAKE
-# Must be exactly 32000000000000000000 (32 OG in gwei)
+# Check stake amount for EVM operations
+echo $INITIAL_STAKE_EVM
+# Must be exactly 32000000000000000000 (32 OG in wei)
+
+# Check stake amount for Cosmos operations
+echo $INITIAL_STAKE_COSMOS
+# Must be exactly 32000000000 (32 OG in Cosmos format)
 ```
 
 #### 3. "signature mismatch"
 ```bash
-# Regenerate signature
+# Regenerate signature (using Cosmos format)
 0gchaind deposit create-validator \
   $VALIDATOR_CONTRACT \
-  $INITIAL_STAKE \
+  $INITIAL_STAKE_COSMOS \
   $GENESIS_PATH \
   --home $HOME_DIR \
   --chaincfg.chain-spec=$CHAIN_SPEC
@@ -432,6 +440,10 @@ cast call $STAKING_CONTRACT "validatorCount()(uint32)" --rpc-url $RPC_URL
 echo "6. Wallet balance:"
 cast balance $YOUR_WALLET_ADDRESS --rpc-url $RPC_URL --ether
 
+echo "7. Stake amounts:"
+echo "   EVM format: $INITIAL_STAKE_EVM"
+echo "   Cosmos format: $INITIAL_STAKE_COSMOS"
+
 echo "=== Health check complete ==="
 ```
 
@@ -443,7 +455,7 @@ Your validator setup is successful if:
 
 - ✅ **Transaction confirmed** - Shows SUCCESS status on explorer
 - ✅ **getValidator()** returns your validator contract address
-- ✅ **tokens()** returns 32000000000000000000 (32 OG)
+- ✅ **tokens()** returns 32000000000000000000 (32 OG in wei)
 - ✅ **Node logs** show validator activation messages
 - ✅ **Consensus participation** - Validator appears in validator set
 
