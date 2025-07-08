@@ -107,12 +107,16 @@ export CHAIN_SPEC=devnet
 # 0G Testnet konfigürasyonu
 export RPC_URL=https://evmrpc-testnet.0g.ai
 export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9
-export INITIAL_STAKE=32000000000  # 32 OG gwei cinsinden
+
+# Stake miktarları (EVM ve Cosmos işlemleri için farklı)
+export INITIAL_STAKE_EVM=32000000000000000000    # EVM/cast komutları için 32 OG (wei cinsinden)
+export INITIAL_STAKE_COSMOS=32000000000          # 0gchaind komutları için 32 OG (Cosmos formatı)
 
 # Kalıcı hale getir (~/.bashrc'ye ekle)
 echo "export RPC_URL=https://evmrpc-testnet.0g.ai" >> ~/.bashrc
 echo "export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9" >> ~/.bashrc
-echo "export INITIAL_STAKE=32000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE_EVM=32000000000000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE_COSMOS=32000000000" >> ~/.bashrc
 ```
 
 ### 2. Gerekli Dosyaları Doğrula
@@ -159,11 +163,11 @@ export VALIDATOR_CONTRACT=$VALIDATOR_CONTRACT
 
 ### 5. İmza Oluştur
 ```bash
-# Validator imzası oluştur
+# Validator imzası oluştur (Cosmos formatı kullanarak)
 echo "=== Validator İmzası Oluşturuluyor ==="
 0gchaind deposit create-validator \
   $VALIDATOR_CONTRACT \
-  $INITIAL_STAKE \
+  $INITIAL_STAKE_COSMOS \
   $GENESIS_PATH \
   --home $HOME_DIR \
   --chaincfg.chain-spec=$CHAIN_SPEC
@@ -193,7 +197,7 @@ cast balance $YOUR_WALLET_ADDRESS --rpc-url $RPC_URL --ether
 
 ### 7. Validator'ı Kaydet
 ```bash
-# Validator'ı staking contract'ına kaydet
+# Validator'ı staking contract'ına kaydet (EVM formatı kullanarak)
 echo "=== Validator Kaydediliyor ==="
 cast send $STAKING_CONTRACT \
   "createAndInitializeValidatorIfNecessary((string,string,string,string,string),uint32,uint96,bytes,bytes)" \
@@ -202,7 +206,7 @@ cast send $STAKING_CONTRACT \
   1 \
   $PUBKEY \
   $SIGNATURE \
-  --value $INITIAL_STAKE \
+  --value $INITIAL_STAKE_EVM \
   --gas-limit 1000000 \
   --gas-price 50000000000 \
   --private-key $PRIVATE_KEY \
@@ -245,7 +249,7 @@ cast call $STAKING_CONTRACT \
     $PUBKEY \
     --rpc-url $RPC_URL
 
-# Validator bakiyesini kontrol et (32000000000 göstermeli)
+# Validator bakiyesini kontrol et (32000000000000000000 göstermeli)
 cast call $VALIDATOR_CONTRACT \
     "tokens()(uint256)" \
     --rpc-url $RPC_URL
@@ -309,7 +313,7 @@ cast call $VALIDATOR_CONTRACT \
 cast send $VALIDATOR_CONTRACT \
     "delegate(address)" \
     $YOUR_WALLET_ADDRESS \
-    --value 1000000000 \
+    --value 1000000000000000000 \
     --gas-limit 1000000 \
     --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
@@ -323,7 +327,7 @@ cast send $VALIDATOR_CONTRACT \
     "undelegate(address,uint256)" \
     $WITHDRAWAL_ADDRESS \
     $SHARES_AMOUNT \
-    --value 1000000000 \
+    --value 1000000000000000000 \
     --gas-limit 1000000 \
     --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
@@ -364,17 +368,21 @@ echo "Token almak için: https://faucet.0g.ai"
 
 #### 2. "DelegationBelowMinimum"
 ```bash
-# Stake miktarını kontrol et
-echo $INITIAL_STAKE
-# Tam olarak 32000000000 olmalı (32 OG gwei cinsinden)
+# EVM işlemleri için stake miktarını kontrol et
+echo $INITIAL_STAKE_EVM
+# Tam olarak 32000000000000000000 olmalı (32 OG wei cinsinden)
+
+# Cosmos işlemleri için stake miktarını kontrol et
+echo $INITIAL_STAKE_COSMOS
+# Tam olarak 32000000000 olmalı (32 OG Cosmos formatında)
 ```
 
 #### 3. "signature mismatch"
 ```bash
-# İmzayı yeniden oluştur
+# İmzayı yeniden oluştur (Cosmos formatı kullanarak)
 0gchaind deposit create-validator \
   $VALIDATOR_CONTRACT \
-  $INITIAL_STAKE \
+  $INITIAL_STAKE_COSMOS \
   $GENESIS_PATH \
   --home $HOME_DIR \
   --chaincfg.chain-spec=$CHAIN_SPEC
@@ -434,6 +442,10 @@ cast call $STAKING_CONTRACT "validatorCount()(uint32)" --rpc-url $RPC_URL
 echo "6. Cüzdan bakiyesi:"
 cast balance $YOUR_WALLET_ADDRESS --rpc-url $RPC_URL --ether
 
+echo "7. Stake miktarları:"
+echo "   EVM formatı: $INITIAL_STAKE_EVM"
+echo "   Cosmos formatı: $INITIAL_STAKE_COSMOS"
+
 echo "=== Sağlık kontrolü tamamlandı ==="
 ```
 
@@ -445,7 +457,7 @@ Validator kurulumunuz başarılı ise:
 
 - ✅ **Transaction onaylandı** - Explorer'da SUCCESS durumu gösterir
 - ✅ **getValidator()** validator contract adresinizi döndürür
-- ✅ **tokens()** 32000000000 (32 OG) döndürür
+- ✅ **tokens()** 32000000000000000000 (32 OG wei cinsinden) döndürür
 - ✅ **Node logları** validator aktivasyon mesajları gösterir
 - ✅ **Consensus katılımı** - Validator validator set'te görünür
 
