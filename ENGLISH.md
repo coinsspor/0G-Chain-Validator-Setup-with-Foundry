@@ -243,7 +243,7 @@ cast call $STAKING_CONTRACT \
     $PUBKEY \
     --rpc-url $RPC_URL
 
-# Check validator balance (should show 32000000000)
+# Check validator balance (should show 32000000000000000000)
 cast call $VALIDATOR_CONTRACT \
     "tokens()(uint256)" \
     --rpc-url $RPC_URL
