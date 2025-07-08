@@ -107,12 +107,12 @@ export CHAIN_SPEC=devnet
 # 0G Testnet konfigürasyonu
 export RPC_URL=https://evmrpc-testnet.0g.ai
 export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9
-export INITIAL_STAKE=32000000000  # 32 OG gwei cinsinden
+export INITIAL_STAKE=32000000000000000000  # 32 OG gwei cinsinden
 
 # Kalıcı hale getir (~/.bashrc'ye ekle)
 echo "export RPC_URL=https://evmrpc-testnet.0g.ai" >> ~/.bashrc
 echo "export STAKING_CONTRACT=0xea224dBB52F57752044c0C86aD50930091F561B9" >> ~/.bashrc
-echo "export INITIAL_STAKE=32000000000" >> ~/.bashrc
+echo "export INITIAL_STAKE=32000000000000000000" >> ~/.bashrc
 ```
 
 ### 2. Gerekli Dosyaları Doğrula
@@ -203,6 +203,8 @@ cast send $STAKING_CONTRACT \
   $PUBKEY \
   $SIGNATURE \
   --value $INITIAL_STAKE \
+  --gas-limit 1000000 \
+  --gas-price 50000000000 \
   --private-key $PRIVATE_KEY \
   --rpc-url $RPC_URL
 
@@ -243,7 +245,7 @@ cast call $STAKING_CONTRACT \
     $PUBKEY \
     --rpc-url $RPC_URL
 
-# Validator bakiyesini kontrol et (32000000000 göstermeli)
+# Validator bakiyesini kontrol et (32000000000000000000 göstermeli)
 cast call $VALIDATOR_CONTRACT \
     "tokens()(uint256)" \
     --rpc-url $RPC_URL
@@ -278,6 +280,8 @@ curl -s http://localhost:26657/validators | jq '.result.validators[] | select(.p
 cast send $VALIDATOR_CONTRACT \
     "withdrawCommission(address)" \
     $YOUR_WALLET_ADDRESS \
+    --gas-limit 1000000 \
+    --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -306,6 +310,8 @@ cast send $VALIDATOR_CONTRACT \
     "delegate(address)" \
     $YOUR_WALLET_ADDRESS \
     --value 1000000000 \
+    --gas-limit 1000000 \
+    --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -318,6 +324,8 @@ cast send $VALIDATOR_CONTRACT \
     $WITHDRAWAL_ADDRESS \
     $SHARES_AMOUNT \
     --value 1000000000 \
+    --gas-limit 1000000 \
+    --gas-price 50000000000 \
     --private-key $PRIVATE_KEY \
     --rpc-url $RPC_URL
 ```
@@ -358,7 +366,7 @@ echo "Token almak için: https://faucet.0g.ai"
 ```bash
 # Stake miktarını kontrol et
 echo $INITIAL_STAKE
-# Tam olarak 32000000000 olmalı (32 OG gwei cinsinden)
+# Tam olarak 32000000000000000000 olmalı (32 OG gwei cinsinden)
 ```
 
 #### 3. "signature mismatch"
@@ -437,7 +445,7 @@ Validator kurulumunuz başarılı ise:
 
 - ✅ **Transaction onaylandı** - Explorer'da SUCCESS durumu gösterir
 - ✅ **getValidator()** validator contract adresinizi döndürür
-- ✅ **tokens()** 32000000000 (32 OG) döndürür
+- ✅ **tokens()** 32000000000000000000 (32 OG) döndürür
 - ✅ **Node logları** validator aktivasyon mesajları gösterir
 - ✅ **Consensus katılımı** - Validator validator set'te görünür
 
