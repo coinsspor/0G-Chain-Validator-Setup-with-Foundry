@@ -61,8 +61,7 @@ curl -s http://localhost:26657/status | jq .result.sync_info.catching_up
 
 ### 2. Foundry Kurulumu
 ```bash
-# Foundry kurulu mu kontrol et
-which cast && which forge && echo "✅ Foundry zaten kurulu" || echo "❌ Foundry kurulumu gerekli"
+
 
 # Foundry kur
 curl -L https://foundry.paradigm.xyz | bash
