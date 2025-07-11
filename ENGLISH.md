@@ -61,8 +61,7 @@ curl -s http://localhost:26657/status | jq .result.sync_info.catching_up
 
 ### 2. Install Foundry
 ```bash
-# Check if Foundry is already installed
-which cast && which forge && echo "✅ Foundry already installed" || echo "❌ Foundry installation required"
+
 
 # Install Foundry
 curl -L https://foundry.paradigm.xyz | bash
